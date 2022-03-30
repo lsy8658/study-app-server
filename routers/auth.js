@@ -104,8 +104,9 @@ router.post("/updateToken", async (req, res) => {
 
 router.post("/login", async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
+  !user && res.status(400).json("찾는 아이디가 없음");
   const password = await bcrypt.compare(req.body.password, user.password);
-
+  !password && res.status(400).json("비밀번호가 다릅니다.");
   const accessToken = generateAccessToken(user);
   const refreshToken = generateRefreshToken(user);
   refreshTokens.push(refreshToken);
