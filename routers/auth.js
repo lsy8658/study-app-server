@@ -106,11 +106,9 @@ router.post("/login", async (req, res) => {
   const user = await User.findOne({ email: req.body.email });
   const password = await bcrypt.compare(req.body.password, user.password);
 
-  if (user && password) {
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
-    refreshTokens.push(refreshToken);
-  }
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+  refreshTokens.push(refreshToken);
 
   try {
     await user.updateOne({ token: refreshToken });
