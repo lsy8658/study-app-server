@@ -112,9 +112,10 @@ router.post("/login", async (req, res) => {
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
     refreshTokens.push(refreshToken);
+
     await user.updateOne({ token: refreshToken });
     //refreshToken db저장
-
+    res.cookie("jwt", refreshToken, { httpOnly: true });
     res.status(200).json({ accessToken, user });
   } catch (err) {
     res.status(500).json(err);

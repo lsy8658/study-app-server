@@ -1,7 +1,7 @@
 const express = require("express");
 const app = express();
 const morgan = require("morgan");
-const helmet = require("helmet");
+
 const cors = require("cors");
 const dotenv = require("dotenv");
 const mongoose = require("mongoose");
@@ -15,7 +15,7 @@ app.use(cors());
 // app.use(cors({ origin: "https://studyapp.vercel.app", credential: "true" }));
 // origin: '*', // 출처 허용 옵션 credential 사용자 인증이 필요한 리소스(쿠키 ..등) 접근
 app.use(express.json());
-app.use(helmet());
+
 app.use(morgan("common"));
 app.use(cookieParser());
 app.get("/", (req, res) => {
@@ -36,7 +36,7 @@ mongoose
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/study", studyRouter);
-const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
+const port = process.env.PORT || 8080;
+app.listen(port, () => {
   console.log("서버에 연결되었습니다.");
 });
