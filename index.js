@@ -11,7 +11,7 @@ const studyRouter = require("./routers/study");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
 dotenv.config();
-
+app.use(cors());
 mongoose
   .connect(process.env.MONGODB_URL, {
     useNewUrlParser: true,
@@ -24,7 +24,6 @@ mongoose
     console.log(err);
   });
 
-app.use(cors());
 app.use(express.json());
 app.use(helmet());
 app.use(morgan("common"));
@@ -33,6 +32,6 @@ const PORT = process.env.PORT || 5000;
 app.use("/api/auth", authRouter);
 app.use("/api/user", userRouter);
 app.use("/api/study", studyRouter);
-app.listen(PORT, () => {
+app.listen(process.env.PORT, () => {
   console.log("서버에 연결되었습니다.");
 });
