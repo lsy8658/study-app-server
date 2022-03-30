@@ -12,7 +12,7 @@ const studyRouter = require("./routers/study");
 const cookieParser = require("cookie-parser");
 dotenv.config();
 app.use(cors());
-app.use(cors({ origin: "*", credential: "true" }));
+app.use(cors({ origin: "https://studyapp.vercel.app/", credential: "true" }));
 // origin: '*', // 출처 허용 옵션 credential 사용자 인증이 필요한 리소스(쿠키 ..등) 접근
 app.use(express.json());
 app.use(helmet());
