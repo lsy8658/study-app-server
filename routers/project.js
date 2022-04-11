@@ -1,6 +1,6 @@
 const router = require("express").Router();
 const jwt = require("jsonwebtoken");
-const Study = require("../models/study");
+const Project = require("../models/project");
 const User = require("../models/user");
 const Chat = require("../models/chatroom");
 const verify = (req, res, next) => {
@@ -18,45 +18,55 @@ const verify = (req, res, next) => {
     return res.status(401).json("접근 권한이 없습니다.");
   }
 };
+// -------------------project 생성--------------------------
 router.post("/create", verify, async (req, res) => {
-  const newStudy = new Study({
+  const newProject = new Project({
     area: req.body.area,
+    deadline: req.body.deadline,
     headCount: req.body.headCount,
     language: req.body.language,
     meet: req.body.meet,
     title: req.body.title,
     master: req.body.master,
     member_id: { user: req.body.master, waiting: true, grade: false },
+    desc: req.body.desc,
   });
   try {
-    const data = await newStudy.save();
+    const data = await newProject.save();
     res.status(200).json(data);
   } catch (err) {
     res.status(500).json(err);
   }
 });
-//-------현재 진행중인 study만 가져오기----------
-router.get("/Studying", async (req, res) => {
+// ----------------------------------------------------
+
+// -------------------개인 project 가져오기--------------------------
+
+router.get("/myProject", verify, async (req, res) => {
   try {
-    const data = await Study.find({ success: false }).sort({ createdAt: -1 });
+    const data = await Project.save();
     res.status(200).json(data);
   } catch (err) {
     res.status(500).json(err);
   }
 });
-// ---------------------------------------------
-router.get("/getStudy", async (req, res) => {
+
+// ---------------------------프로젝트에 포함되어있으면 -------------------------
+
+// ------------------모든 project 불러오기----------------------------------
+router.get("/getProject", async (req, res) => {
   try {
-    const data = await Study.find({});
+    const data = await Project.find({}).sort({ createdAt: -1 });
     res.status(200).json(data);
   } catch (err) {
     res.status(500).json(err);
   }
 });
-// --------------------새로운 스터디 2개정도 불러오기--------------------------------
-router.get("/newStudy", async (req, res) => {
+// ----------------------------------------------------
+// --------------------새로운 프로젝트 2개정도 불러오기--------------------------------
+router.get("/newProject", async (req, res) => {
   try {
-    const data = await Study.find().sort({ createdAt: -1 }).limit(2);
+    const data = await Project.find().sort({ createdAt: -1 }).limit(2);
 
     res.status(200).json(data);
   } catch (err) {
@@ -64,13 +74,24 @@ router.get("/newStudy", async (req, res) => {
   }
 });
 // ----------------------------------------------------
-router.put("/studySuccess/:id", verify, async (req, res) => {
-  const studyId = req.params.id;
+//-------현재 진행중인 Project만 가져오기----------
+router.get("/Projecting", async (req, res) => {
   try {
-    const data = await Study.findByIdAndUpdate(
-      { _id: studyId },
+    const data = await Project.find({ success: false }).sort({ createdAt: -1 });
+    res.status(200).json(data);
+  } catch (err) {
+    res.status(500).json(err);
+  }
+});
+// ---------------------------------------------
+// -----------------------프로젝트 완료-----------------------------
+router.put("/updateUrl/:id", verify, async (req, res) => {
+  const projectId = req.params.id;
+  try {
+    const data = await Project.findByIdAndUpdate(
+      { _id: projectId },
       {
-        $set: { success: true },
+        $set: { url: req.body.url, success: true },
       }
     );
     res.status(200).json(data);
@@ -83,7 +104,7 @@ router.put("/studySuccess/:id", verify, async (req, res) => {
 router.post("/search", async (req, res) => {
   const text = req.body.text;
   const caseText = text.toLowerCase();
-  const data = await Study.find({}).sort({ createdAt: -1 });
+  const data = await Project.find({}).sort({ createdAt: -1 });
   const filter = await data.filter((item) => {
     return item.title.toLowerCase().indexOf(caseText) !== -1;
   });
@@ -96,11 +117,11 @@ router.post("/search", async (req, res) => {
 // ----------------------------------------------------
 // -----------------------프로젝트 참여하기-----------------------------
 router.post("/participate/:id", verify, async (req, res) => {
-  const studyId = req.params.id;
+  const projectId = req.params.id;
 
   try {
-    const data = await Study.findByIdAndUpdate(
-      { _id: studyId },
+    const data = await Project.findByIdAndUpdate(
+      { _id: projectId },
       {
         $push: {
           member_id: req.body,
@@ -120,7 +141,7 @@ router.post("/refuse/:id", verify, async (req, res) => {
   const projectId = req.params.id;
   const userId = req.body.email;
   try {
-    const data = await Study.findByIdAndUpdate(
+    const data = await Project.findByIdAndUpdate(
       { _id: projectId },
       {
         $pull: {
@@ -134,13 +155,12 @@ router.post("/refuse/:id", verify, async (req, res) => {
     res.status(500).json(err);
   }
 });
-// -----------------------------------------------------
 // -----------------------대기자 수락하기 ------------------------------
 router.post("/accept/:id", verify, async (req, res) => {
   const projectId = req.params.id;
   const userId = req.body.email;
 
-  const data = await Study.findByIdAndUpdate(
+  const data = await Project.findByIdAndUpdate(
     { _id: projectId },
     {
       $pull: {
@@ -149,7 +169,7 @@ router.post("/accept/:id", verify, async (req, res) => {
     }
   );
   try {
-    const updateData = await Study.findByIdAndUpdate(
+    const updateData = await Project.findByIdAndUpdate(
       { _id: projectId },
       {
         $push: {
@@ -164,49 +184,48 @@ router.post("/accept/:id", verify, async (req, res) => {
   }
 });
 // -----------------------------------------------------
-// ---------------내가 참여하고있는 study--------------
-router.post("/myStudy", async (req, res) => {
+// ---------------내가 참여하고있는 project--------------
+router.post("/myProject", async (req, res) => {
   const email = req.body.email;
   try {
-    const data = await Study.find({
+    const data = await Project.find({
       success: false,
       $or: [
         { member_id: { $in: { user: email, waiting: true, grade: false } } },
         { member_id: { $in: { user: email, waiting: true, grade: true } } },
       ],
     });
-    // const myProject = await data.find({});
+
     res.status(200).json(data);
   } catch (err) {
     res.status(500).json(err);
   }
 });
 // -----------------------------------------------------
-// ---------------내가 참여했던 study--------------
-router.post("/mySuccessStudy", async (req, res) => {
+// ---------------내가 참여했던 project------------------
+router.post("/mySuccessProject", async (req, res) => {
   const email = req.body.email;
   try {
-    const data = await Study.find({
+    const data = await Project.find({
       success: true,
       $or: [
         { member_id: { $in: { user: email, waiting: true, grade: false } } },
         { member_id: { $in: { user: email, waiting: true, grade: true } } },
       ],
     });
-    // const myProject = await data.find({});
+
     res.status(200).json(data);
   } catch (err) {
     res.status(500).json(err);
   }
 });
-// -----------------------------------------------------
 // -------------------------포기하기 평점부과(다른 유저)----------------------------
 router.post("/abandonment/:id", async (req, res) => {
   const email = req.body.email;
-  const study_id = req.params.id;
+  const project_id = req.params.id;
   try {
-    const data = await Study.findByIdAndUpdate(
-      { _id: study_id },
+    const data = await Project.findByIdAndUpdate(
+      { _id: project_id },
       {
         $pull: {
           member_id: { user: email },
@@ -218,7 +237,7 @@ router.post("/abandonment/:id", async (req, res) => {
       { email: email },
       {
         $push: {
-          grade: 2,
+          grade: 1,
         },
       }
     );
@@ -230,23 +249,21 @@ router.post("/abandonment/:id", async (req, res) => {
 });
 // ----------------------------------------------------------------------
 // ---------------------------포기하기 평점부과(방장)----------------------------
-// Chat
 
-router.post("/studyAbandon/:id", async (req, res) => {
+router.post("/projectAbandon/:id", async (req, res) => {
   const email = req.body.email;
   const project_id = req.params.id;
   try {
-    const data = await Study.findByIdAndDelete({ _id: project_id });
+    const data = await Project.findByIdAndDelete({ _id: project_id });
 
     const userGrade = await User.updateOne(
       { email: email },
       {
         $push: {
-          grade: 2,
+          grade: 1,
         },
       }
     );
-
     const chatDelete = await Chat.deleteOne({
       projectId: project_id,
     });
@@ -281,16 +298,16 @@ router.post("/gradeTrue/:id", verify, async (req, res) => {
   const projectId = req.params.id;
   const userId = req.body.email;
 
-  const data = await Study.findByIdAndUpdate(
-    { _id: projectId },
-    {
-      $pull: {
-        member_id: { user: userId },
-      },
-    }
-  );
   try {
-    const updateData = await Study.findByIdAndUpdate(
+    const data = await Project.findByIdAndUpdate(
+      { _id: projectId },
+      {
+        $pull: {
+          member_id: { user: userId },
+        },
+      }
+    );
+    const updateData = await Project.findByIdAndUpdate(
       { _id: projectId },
       {
         $push: {
@@ -299,7 +316,7 @@ router.post("/gradeTrue/:id", verify, async (req, res) => {
       },
       { new: true }
     );
-    res.status(200).json("데이서 수정");
+    res.status(200).json(userId);
   } catch (err) {
     res.status(500).json(err);
   }

@@ -1,30 +1,45 @@
 const mongoose = require("mongoose");
 
-const studySchema = new mongoose.Schema({
-  headCount: {
-    type: String,
+const projectSchema = new mongoose.Schema(
+  {
+    headCount: {
+      type: Number,
+    },
+    language: {
+      type: String,
+    },
+    area: {
+      type: String,
+    },
+    desc: {
+      type: String,
+    },
+    member_id: {
+      type: Array,
+      default: [],
+    },
+    url: {
+      type: String,
+      default: "",
+    },
+    deadline: {
+      type: String,
+    },
+    meet: {
+      type: String,
+    },
+    master: {
+      type: String,
+    },
+    title: {
+      type: String,
+    },
+    success: {
+      type: Boolean,
+      default: false,
+    },
   },
-  language: {
-    type: Array,
-    default: [],
-  },
-  member_id: {
-    type: Array,
-    default: [],
-  },
-  url: {
-    type: String,
-  },
+  { timestamps: true }
+);
 
-  meet: {
-    type: String,
-  },
-  master: {
-    type: String,
-  },
-  title: {
-    type: String,
-  },
-});
-
-module.exports = mongoose.model("study", studySchema);
+module.exports = mongoose.model("project", projectSchema);
