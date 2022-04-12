@@ -43,7 +43,7 @@ app.use("/api/chat", chatRouter);
 // ----------------채팅-------------------------
 const io = require("socket.io")(server, {
   cors: {
-    origin: "https://studyapp.vercel.app",
+    origin: "*",
     methohs: ["GET", "POST"],
   },
 });
@@ -75,7 +75,7 @@ io.on("connection", (socket) => {
   });
 });
 // -----------------------------------------
-const port = process.env.PORT || 8080;
+const port = process.env.PORT || 3000;
 server.listen(port, () => {
   console.log("서버에 연결되었습니다.");
 });
