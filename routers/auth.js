@@ -6,13 +6,13 @@ const jwt = require("jsonwebtoken");
 // -------------------Token 생성-------------------
 const generateAccessToken = (user) => {
   return jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN, {
-    expiresIn: "2m",
+    expiresIn: "30m",
     issuer: "sungyoon",
   });
 };
 const generateRefreshToken = (user) => {
   return jwt.sign({ email: user.email }, process.env.REFRESH_TOKEN, {
-    expiresIn: "4m",
+    expiresIn: "2d",
     issuer: "sungyoon",
   });
 };
@@ -34,7 +34,7 @@ const verify = (req, res, next) => {
   }
 };
 // ----------------------------------------------
-let refreshTokens = [];
+// let refreshTokens = [];
 // -------------------Token 새로고침-------------------
 router.post("/refresh", async (req, res) => {
   const userId = req.body.email;
@@ -123,7 +123,7 @@ router.post("/login", async (req, res) => {
 
     const accessToken = generateAccessToken(user);
     const refreshToken = generateRefreshToken(user);
-    refreshTokens.push(refreshToken);
+    // refreshTokens.push(refreshToken);
     await User.findByIdAndUpdate(
       { _id: user._id },
       { $set: { token: refreshToken } }
@@ -139,7 +139,7 @@ router.post("/login", async (req, res) => {
 // -----------------Logout-----------------------------
 router.post("/logout", verify, (req, res) => {
   const refreshToken = req.body.token;
-  refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+  // refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
   res.status(200).json("로그아웃 되었습니다.");
 });
 // -----------------------------------------------------
