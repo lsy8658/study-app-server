@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 // -------------------Token 생성-------------------
 const generateAccessToken = (user) => {
   return jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN, {
-    expiresIn: "30m",
+    expiresIn: "1m",
     issuer: "sungyoon",
   });
 };
