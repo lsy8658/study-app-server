@@ -75,7 +75,11 @@ io.on("connection", (socket) => {
   });
 });
 // -----------------------------------------
-// const port = process.env.PORT || 3000;
-server.listen(process.env.PORT || 3000, () => {
-  console.log("서버에 연결되었습니다.");
+const PORT = process.env.PORT || config.httpPort;
+server.listen(PORT, () => {
+  console.log(
+    "Express server listening on port %d in %s mode",
+    this.address().port,
+    app.settings.env
+  );
 });
