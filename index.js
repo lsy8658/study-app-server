@@ -48,7 +48,7 @@ const io = require("socket.io")(server, {
   },
 });
 io.configure(function () {
-  io.set("transports", ["xhr-polling"]);
+  io.set("transports", ["websocket", "polling"]);
   io.set("polling duration", 10);
 });
 // node와 소켓이 같은 포트에서 동작해야한다..! 포트가 달라서..에러가
@@ -75,7 +75,7 @@ io.on("connection", (socket) => {
   });
 });
 // -----------------------------------------
-const port = process.env.PORT || 3000;
-server.listen(port, () => {
+// const port = process.env.PORT || 3000;
+server.listen(process.env.PORT || 3000, () => {
   console.log("서버에 연결되었습니다.");
 });
