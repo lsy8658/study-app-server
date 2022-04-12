@@ -45,9 +45,9 @@ router.post("/refresh", async (req, res) => {
   try {
     // //토큰이 없거나 유효하지 않으면 오류를 보냅니다.
     !refreshToken && res.status(401).json("인증되지 않았습니다!");
-    if (refreshTokens.includes(refreshToken)) {
-      return res.status(403).json("새로고침 토큰이 유효하지 않습니다!");
-    }
+    // if (refreshTokens.includes(refreshToken)) {
+    //   return res.status(403).json("새로고침 토큰이 유효하지 않습니다!");
+    // }
     // // //모든 것이 정상이면 새 액세스 토큰을 생성하고 토큰을 새로고침하여 사용자에게 보냅니다.
     if (token === refreshToken) {
       jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (error, user) => {
