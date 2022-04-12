@@ -47,6 +47,10 @@ const io = require("socket.io")(server, {
     methohs: ["GET", "POST"],
   },
 });
+io.configure(function () {
+  io.set("transports", ["xhr-polling"]);
+  io.set("polling duration", 10);
+});
 // node와 소켓이 같은 포트에서 동작해야한다..! 포트가 달라서..에러가
 // -----------------------------------------
 io.on("connection", (socket) => {
