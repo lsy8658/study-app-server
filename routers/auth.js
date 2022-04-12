@@ -115,14 +115,19 @@ router.post("/register", async (req, res) => {
 
 // --------------------login--------------------------
 router.post("/login", async (req, res) => {
-  try {
-    const user = await User.findOne({ email: req.body.email });
-    !user && res.status(400).json("찾는 아이디가 없음");
-    const password = await bcrypt.compare(req.body.password, user.password);
-    !password && res.status(400).json("비밀번호가 다릅니다.");
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return res.status(400).json("찾는 아이디가 없음");
+  }
 
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+  const password = await bcrypt.compare(req.body.password, user.password);
+  if (!password) {
+    return res.status(400).json("비밀번호가 다릅니다.");
+  }
+
+  const accessToken = generateAccessToken(user);
+  const refreshToken = generateRefreshToken(user);
+  try {
     // refreshTokens.push(refreshToken);
     await User.findByIdAndUpdate(
       { _id: user._id },
