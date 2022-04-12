@@ -43,10 +43,11 @@ app.use("/api/chat", chatRouter);
 // ----------------채팅-------------------------
 const io = require("socket.io")(server, {
   cors: {
-    origin: "https://studyapp.vercel.app/",
+    origin: "*",
     methohs: ["GET", "POST"],
   },
 });
+// node와 소켓이 같은 포트에서 동작해야한다..! 포트가 달라서..에러가
 // -----------------------------------------
 io.on("connection", (socket) => {
   // console.log(`User connection ID : ${socket.id}`);
