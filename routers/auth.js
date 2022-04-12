@@ -6,7 +6,7 @@ const jwt = require("jsonwebtoken");
 // -------------------Token 생성-------------------
 const generateAccessToken = (user) => {
   return jwt.sign({ email: user.email }, process.env.ACCESS_TOKEN, {
-    expiresIn: "1m",
+    expiresIn: "30m",
     issuer: "sungyoon",
   });
 };
@@ -40,27 +40,24 @@ router.post("/refresh", async (req, res) => {
   const userId = req.body.email;
   //사용자로부터 새로고침 토큰을 받습니다.
   const user = await User.find({ email: userId });
-  res.status(200).json(user.data.token);
-  // const refreshToken = req.body.token;
-  // //토큰이 없거나 유효하지 않으면 오류를 보냅니다.
-  // !refreshToken && res.status(401).json("인증되지 않았습니다!");
-  // if (refreshTokens.includes(refreshToken)) {
-  //   return res.status(403).json("새로고침 토큰이 유효하지 않습니다!");
-  // }
-  // //모든 것이 정상이면 새 액세스 토큰을 생성하고 토큰을 새로고침하여 사용자에게 보냅니다.
-  // if (user.token === refreshToken) {
-  //   jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (error, user) => {
-  //     error && console.log(error);
-  //     refreshTokens = refreshTokens.filter((token) => token !== refreshToken);
+  const refreshToken = req.body.token;
+  //토큰이 없거나 유효하지 않으면 오류를 보냅니다.
+  !refreshToken && res.status(401).json("인증되지 않았습니다!");
+  if (refreshTokens.includes(refreshToken)) {
+    return res.status(403).json("새로고침 토큰이 유효하지 않습니다!");
+  }
+  //모든 것이 정상이면 새 액세스 토큰을 생성하고 토큰을 새로고침하여 사용자에게 보냅니다.
+  if (user.token === refreshToken) {
+    jwt.verify(refreshToken, process.env.REFRESH_TOKEN, (error, user) => {
+      error && console.log(error);
 
-  //     const newAccessToken = generateAccessToken(user);
+      const newAccessToken = generateAccessToken(user);
 
-  //     return res.status(200).json(newAccessToken);
-  //   });
-
-  // } else {
-  //   return res.status(403).json("새로고침 토큰이 유효하지 않습니다!");
-  // }
+      return res.status(200).json(newAccessToken);
+    });
+  } else {
+    return res.status(403).json("새로고침 토큰이 유효하지 않습니다!");
+  }
 });
 // ----------------------------------------------
 // router.post("/refresh", async (req, res) => {
