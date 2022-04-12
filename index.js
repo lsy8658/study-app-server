@@ -43,7 +43,7 @@ app.use("/api/chat", chatRouter);
 // ----------------채팅-------------------------
 const io = require("socket.io")(server, {
   cors: {
-    origin: "*",
+    origin: "https://studyapp.vercel.app",
     methohs: ["GET", "POST"],
   },
 });
