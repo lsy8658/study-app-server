@@ -12,7 +12,7 @@ const generateAccessToken = (user) => {
 };
 const generateRefreshToken = (user) => {
   return jwt.sign({ email: user.email }, process.env.REFRESH_TOKEN, {
-    expiresIn: "2d",
+    expiresIn: "4m",
     issuer: "sungyoon",
   });
 };
