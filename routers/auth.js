@@ -40,7 +40,7 @@ router.post("/refresh", async (req, res) => {
   const userId = req.body.email;
   //사용자로부터 새로고침 토큰을 받습니다.
   try {
-    const user = await User.find({ email: userId });
+    const user = await User.findOne({ email: userId });
     const refreshToken = req.body.token;
     // //토큰이 없거나 유효하지 않으면 오류를 보냅니다.
     // !refreshToken && res.status(401).json("인증되지 않았습니다!");
@@ -53,7 +53,7 @@ router.post("/refresh", async (req, res) => {
     //     error && console.log(error);
 
     //     const newAccessToken = generateAccessToken(user);
-    const token = { token: user.token };
+    const token = { token: user.data.token };
     return res.status(200).json(token);
     //   });
     // } else {
