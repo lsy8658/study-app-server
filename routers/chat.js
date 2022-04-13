@@ -23,7 +23,9 @@ const verify = (req, res, next) => {
 // ----------------참여중인 chat가져오기------------------------
 router.post("/getList", verify, async (req, res) => {
   const email = req.body.email;
-  const data = await ChatRoom.find({ members: { email: email } });
+  const data = await ChatRoom.find({ members: { email: email } }).sort({
+    createdAt: -1,
+  });
   try {
     res.status(200).json(data);
   } catch (err) {
