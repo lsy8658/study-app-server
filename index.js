@@ -76,7 +76,7 @@ io.on("connection", (socket) => {
 });
 // -----------------------------------------
 // const port = process.env.PORT || 3000;
-server.listen(process.env.PORT || 3000, () => {
+server.listen(process.env.PORT || 8000, () => {
   const port = server.address().port;
   console.log(`Express is working on port ${port}`);
 });
